@@ -1,57 +1,100 @@
 export class TaskRenderer {
-  render(tasks) {
-    const taskList = document.getElementById('task-list')
+  constructor() {
+    this.container = document.getElementById('itemList');
+  }
+
+  render(items, currentView) {
+    this.container.innerHTML = '';
     
-    if (tasks.length === 0) {
-      taskList.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 11l3 3 8-8"/>
-              <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.66 0 3.22.45 4.56 1.23"/>
-            </svg>
-          </div>
-          <h3>No tasks found</h3>
-          <p>Try adjusting your filter or add a new task</p>
-        </div>
-      `
-      return
+    if (items.length === 0) {
+      this.renderEmptyState(currentView);
+      return;
     }
 
-    taskList.innerHTML = tasks.map(task => this.renderTask(task)).join('')
+    items.forEach(item => {
+      if (item.type === 'task') {
+        this.renderTask(item);
+      } else if (item.type === 'note') {
+        this.renderNote(item);
+      }
+    });
   }
 
   renderTask(task) {
-    const createdDate = new Date(task.createdAt).toLocaleDateString()
+    const taskElement = document.createElement('div');
+    taskElement.className = `item ${task.completed ? 'completed' : ''}`;
+    taskElement.innerHTML = `
+      <input type="checkbox" class="item-checkbox" ${task.completed ? 'checked' : ''} 
+             onchange="window.taskManager.toggleTask(${task.id})">
+      <span class="item-text">${this.escapeHtml(task.text)}</span>
+      <button class="delete-btn" onclick="window.taskManager.deleteItem(${task.id})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3,6 5,6 21,6"></polyline>
+          <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+        </svg>
+      </button>
+    `;
     
-    return `
-      <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-        <div class="task-content">
-          <button class="task-checkbox ${task.completed ? 'checked' : ''}">
-            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-              <polyline points="20,6 9,17 4,12"/>
-            </svg>
-          </button>
-          <div class="task-text-container">
-            <span class="task-text">${this.escapeHtml(task.text)}</span>
-            <span class="task-date">${createdDate}</span>
-          </div>
-        </div>
-        <button class="delete-button">
+    this.container.appendChild(taskElement);
+  }
+
+  renderNote(note) {
+    const noteElement = document.createElement('div');
+    const preview = note.content.length > 100 ? note.content.substring(0, 100) + '...' : note.content;
+    const date = new Date(note.createdAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    noteElement.className = `note-item ${note.expanded ? 'expanded' : ''}`;
+    noteElement.innerHTML = `
+      <div class="note-header">
+        <button class="expand-btn" onclick="window.taskManager.toggleNoteExpansion(${note.id})">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3,6 5,6 21,6"/>
-            <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
-            <line x1="10" y1="11" x2="10" y2="17"/>
-            <line x1="14" y1="11" x2="14" y2="17"/>
+            <polyline points="${note.expanded ? '18,15 12,9 6,15' : '6,9 12,15 18,9'}"></polyline>
+          </svg>
+        </button>
+        <span class="note-date">${date}</span>
+        <button class="delete-btn" onclick="window.taskManager.deleteItem(${note.id})">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"></polyline>
+            <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,2h4a2,2 0 0,1 2,2v2"></path>
           </svg>
         </button>
       </div>
-    `
+      <div class="note-preview">${this.escapeHtml(preview)}</div>
+      <div class="note-content">${this.escapeHtml(note.content)}</div>
+    `;
+    
+    this.container.appendChild(noteElement);
+  }
+
+  renderEmptyState(currentView) {
+    const emptyElement = document.createElement('div');
+    emptyElement.className = 'empty-state';
+    
+    const message = currentView === 'tasks' 
+      ? 'No tasks yet. Add one above to get started!' 
+      : 'No notes yet. Write your first note above!';
+    
+    const icon = currentView === 'tasks' ? '📝' : '📄';
+    
+    emptyElement.innerHTML = `
+      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">${icon}</div>
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">All caught up!</p>
+        <p style="font-size: 0.9rem;">${message}</p>
+      </div>
+    `;
+    
+    this.container.appendChild(emptyElement);
   }
 
   escapeHtml(text) {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }

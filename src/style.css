@@ -1,513 +1,143 @@
-/* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+import { TaskStorage } from '../utils/TaskStorage.js'
+import { TaskRenderer } from './TaskRenderer.js'
 
-:root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-  --accent-primary: #3b82f6;
-  --accent-hover: #2563eb;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-}
-
-[data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --accent-primary: #3b82f6;
-  --accent-hover: #60a5fa;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* App layout */
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header */
-.app-header {
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.app-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.theme-toggle {
-  width: 44px;
-  height: 44px;
-  border: none;
-  background-color: var(--bg-tertiary);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-secondary);
-}
-
-.theme-toggle:hover {
-  background-color: var(--border-color);
-  transform: translateY(-1px);
-}
-
-.theme-toggle[data-theme="light"] .moon-icon {
-  display: none;
-}
-
-.theme-toggle[data-theme="dark"] .sun-icon {
-  display: none;
-}
-
-/* Main content */
-.main-content {
-  flex: 1;
-  padding: 2rem 1.5rem;
-}
-
-.task-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Task input section */
-.task-input-section {
-  margin-bottom: 2rem;
-}
-
-.input-group {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.task-input {
-  flex: 1;
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: all 0.2s ease;
-}
-
-.task-input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
-}
-
-.task-input::placeholder {
-  color: var(--text-muted);
-}
-
-.add-button {
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.add-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.add-button:active {
-  transform: translateY(0);
-}
-
-/* Task stats */
-.task-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-item {
-  background-color: var(--bg-primary);
-  padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-}
-
-.stat-number {
-  display: block;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--accent-primary);
-  margin-bottom: 0.25rem;
-}
-
-.stat-label {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* Filter tabs */
-.filter-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  background-color: var(--bg-primary);
-  padding: 0.5rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-}
-
-.filter-tab {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.filter-tab:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.filter-tab.active {
-  background-color: var(--accent-primary);
-  color: white;
-}
-
-/* Task list */
-.task-list {
-  background-color: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-}
-
-.task-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-  animation: slideIn 0.3s ease;
-}
-
-.task-item:last-child {
-  border-bottom: none;
-}
-
-.task-item:hover {
-  background-color: var(--bg-secondary);
-}
-
-.task-item.completed {
-  opacity: 0.7;
-}
-
-.task-item.completed .task-text {
-  text-decoration: line-through;
-  color: var(--text-muted);
-}
-
-.task-item.task-added {
-  animation: taskAdded 0.5s ease;
-}
-
-.task-item.task-removing {
-  animation: taskRemoving 0.3s ease forwards;
-}
-
-.task-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-}
-
-.task-checkbox {
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.task-checkbox:hover {
-  border-color: var(--accent-primary);
-}
-
-.task-checkbox.checked {
-  background-color: var(--success-color);
-  border-color: var(--success-color);
-}
-
-.task-checkbox .check-icon {
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.2s ease;
-  color: white;
-}
-
-.task-checkbox.checked .check-icon {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.task-text-container {
-  flex: 1;
-  min-width: 0;
-}
-
-.task-text {
-  display: block;
-  font-weight: 500;
-  color: var(--text-primary);
-  word-break: break-word;
-  margin-bottom: 0.25rem;
-}
-
-.task-date {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.delete-button {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.delete-button:hover {
-  background-color: var(--danger-color);
-  color: white;
-  transform: scale(1.1);
-}
-
-/* Empty state */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--text-muted);
-}
-
-.empty-icon {
-  margin-bottom: 1.5rem;
-  opacity: 0.5;
-}
-
-.empty-state h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary);
-}
-
-.empty-state p {
-  font-size: 0.875rem;
-}
-
-/* Animations */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+export class TaskManager {
+  constructor() {
+    this.storage = new TaskStorage()
+    this.renderer = new TaskRenderer()
+    this.tasks = []
+    this.currentFilter = 'all'
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes taskAdded {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px) scale(0.95);
+  init() {
+    this.loadTasks()
+    this.bindEvents()
+    this.render()
   }
-  50% {
-    transform: translateX(5px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
 
-@keyframes taskRemoving {
-  0% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
+  loadTasks() {
+    this.tasks = this.storage.getTasks()
   }
-  100% {
-    opacity: 0;
-    transform: translateX(20px) scale(0.95);
-    height: 0;
-    padding: 0;
-    margin: 0;
-  }
-}
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .header-content {
-    padding: 1rem;
-  }
-  
-  .main-content {
-    padding: 1.5rem 1rem;
-  }
-  
-  .input-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .add-button {
-    justify-content: center;
-  }
-  
-  .task-stats {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .stat-item {
-    padding: 1rem;
-  }
-  
-  .stat-number {
-    font-size: 1.5rem;
-  }
-  
-  .task-item {
-    padding: 1rem;
-  }
-  
-  .task-content {
-    gap: 0.75rem;
-  }
-}
+  bindEvents() {
+    const taskInput = document.getElementById('task-input')
+    const addButton = document.getElementById('add-task')
+    const taskList = document.getElementById('task-list')
+    const filterTabs = document.querySelectorAll('.filter-tab')
 
-@media (max-width: 480px) {
-  .app-title {
-    font-size: 1.25rem;
+    // Add task events
+    addButton.addEventListener('click', () => this.addTask())
+    taskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.addTask()
+    })
+
+    // Task list events (delegation)
+    taskList.addEventListener('click', (e) => {
+      const taskItem = e.target.closest('.task-item')
+      if (!taskItem) return
+
+      const taskId = parseInt(taskItem.dataset.taskId)
+
+      if (e.target.closest('.task-checkbox')) {
+        this.toggleTask(taskId)
+      } else if (e.target.closest('.delete-button')) {
+        this.deleteTask(taskId)
+      }
+    })
+
+    // Filter events
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        this.setFilter(tab.dataset.filter)
+        this.updateFilterTabs(tab)
+      })
+    })
   }
-  
-  .task-input {
-    padding: 0.875rem 1rem;
+
+  addTask() {
+    const input = document.getElementById('task-input')
+    const text = input.value.trim()
+
+    if (!text) return
+
+    const task = {
+      id: Date.now(),
+      text,
+      completed: false,
+      createdAt: new Date().toISOString()
+    }
+
+    this.tasks.unshift(task)
+    this.storage.saveTasks(this.tasks)
+    input.value = ''
+    this.render()
+
+    // Add animation class
+    setTimeout(() => {
+      const newTaskElement = document.querySelector(`[data-task-id="${task.id}"]`)
+      if (newTaskElement) {
+        newTaskElement.classList.add('task-added')
+      }
+    }, 50)
   }
-  
-  .add-button {
-    padding: 0.875rem 1.25rem;
+
+  toggleTask(id) {
+    const task = this.tasks.find(t => t.id === id)
+    if (task) {
+      task.completed = !task.completed
+      this.storage.saveTasks(this.tasks)
+      this.render()
+    }
   }
-  
-  .filter-tabs {
-    gap: 0.25rem;
-    padding: 0.25rem;
+
+  deleteTask(id) {
+    const taskElement = document.querySelector(`[data-task-id="${id}"]`)
+    if (taskElement) {
+      taskElement.classList.add('task-removing')
+      setTimeout(() => {
+        this.tasks = this.tasks.filter(t => t.id !== id)
+        this.storage.saveTasks(this.tasks)
+        this.render()
+      }, 300)
+    }
   }
-  
-  .filter-tab {
-    padding: 0.625rem 0.75rem;
-    font-size: 0.875rem;
+
+  setFilter(filter) {
+    this.currentFilter = filter
+    this.render()
+  }
+
+  updateFilterTabs(activeTab) {
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.classList.remove('active')
+    })
+    activeTab.classList.add('active')
+  }
+
+  getFilteredTasks() {
+    switch (this.currentFilter) {
+      case 'completed':
+        return this.tasks.filter(task => task.completed)
+      case 'pending':
+        return this.tasks.filter(task => !task.completed)
+      default:
+        return this.tasks
+    }
+  }
+
+  updateStats() {
+    const total = this.tasks.length
+    const completed = this.tasks.filter(t => t.completed).length
+    const pending = total - completed
+
+    document.getElementById('total-tasks').textContent = total
+    document.getElementById('completed-tasks').textContent = completed
+    document.getElementById('pending-tasks').textContent = pending
+  }
+
+  render() {
+    const filteredTasks = this.getFilteredTasks()
+    this.renderer.render(filteredTasks)
+    this.updateStats()
   }
 }
